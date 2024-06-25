@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bluegreen-deployment.fullname" . }}-blue
+  labels:
+    app: {{ include "bluegreen-deployment.name" . }}
+    version: blue
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "bluegreen-deployment.name" . }}
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: {{ include "bluegreen-deployment.name" . }}
+        version: blue
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tagBlue }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 80
+        env:
+        {{- range .Values.env_blue }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
